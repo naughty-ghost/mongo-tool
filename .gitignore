@@ -1,0 +1,10 @@
+# mongodb config
+db
+configdb
+
+# node_modules
+**/node_modules
+
+# build source
+**/dist
+**/build
