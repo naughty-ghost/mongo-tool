@@ -10,20 +10,32 @@ const blogSchema = new Schema({
   meta: {
     votes: Number,
     favs: Number,
-  }
+  },
+  role: Boolean
 });
+const db = mongoose.createConnection();  // まだ開かない
 
+// ハンドラ登録
+// eslint-disable-next-line no-console
+db.on('open' , () => { console.log('open'); });
+// eslint-disable-next-line no-console
+db.on('close', () => { console.log('close'); });
 async function main() {
-  const doc = await mongoose.connect("mongodb://root:passwordmongo@localhost:27017/document?authSource=admin");
+  const doc = await db.openUri("mongodb://root:passwordmongo@localhost:27017/document?authSource=admin");
   // collection作成 
   const blogModel = doc.model("blogs", blogSchema);
-  await blogModel.create({
+  const result = await blogModel.create({
     title: "テスト",
     author: "ホゲホゲ",
     comment: [{ nody: "aaaa", date: new Date() }],
     active: true,
   });
-  return Promise.resolve();
+  await blogModel.findByIdAndUpdate(result.id, {
+    title: "タイトル変更",
+    role: true,
+  });
+  // コネクション切断
+  await mongoose.disconnect();
 }
 
 main();
